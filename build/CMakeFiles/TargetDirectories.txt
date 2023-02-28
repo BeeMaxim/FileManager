@@ -1,3 +1,0 @@
-/home/beemax/CLionProjects/FileManager/build/CMakeFiles/rebuild_cache.dir
-/home/beemax/CLionProjects/FileManager/build/CMakeFiles/edit_cache.dir
-/home/beemax/CLionProjects/FileManager/build/CMakeFiles/main.dir
