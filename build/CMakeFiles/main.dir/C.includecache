@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/beemax/CLionProjects/FileManager/file_system.h
+sys/stat.h
+-
+string.h
+-
+stdio.h
+-
+stdlib.h
+-
+dirent.h
+-
+sys/ioctl.h
+-
+unistd.h
+-
+time.h
+-
+vector.h
+/home/beemax/CLionProjects/FileManager/vector.h
+
+/home/beemax/CLionProjects/FileManager/main.c
+stdio.h
+-
+termios.h
+-
+unistd.h
+-
+string.h
+-
+file_system.h
+/home/beemax/CLionProjects/FileManager/file_system.h
+
+/home/beemax/CLionProjects/FileManager/vector.h
+
