@@ -42,6 +42,7 @@ gcc your_lib.o -shared -o your_lib.so
 ```
 mkdir build
 cd build
+cmake ..
 make
 ./main
 ```
