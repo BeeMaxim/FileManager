@@ -1,3 +1,5 @@
+#pragma once
+
 struct vector {
     void *buf;
     int elem_sizeof;

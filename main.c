@@ -2,8 +2,10 @@
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #include "file_system.h"
+#include "file_open.h"
 
 enum KEY_CODE {
     ENTER = 10,
@@ -17,6 +19,9 @@ enum KEY_CODE {
 
 int main() {
     struct vector *vec = vector_init(sizeof(struct file_info));
+    struct vector *ext_list = vector_init(sizeof(struct file_handler));
+
+    handlers_init(ext_list);
 
     int cursor_pos = 0;
     int hidden_files = 0;
@@ -59,10 +64,19 @@ int main() {
             struct file_info *info;
             vector_get(vec, cursor_pos, (void **) &info);
 
-            chdir(info->name);
+            if (S_ISDIR(info->fstat.st_mode)) {
+                chdir(info->name);
+                cursor_pos = 0;
+                file_count = update_screen(vec, cursor_pos, hidden_files);
+                continue;
+            }
 
-            cursor_pos = 0;
-            file_count = update_screen(vec, cursor_pos, hidden_files);
+            int (*open_file)(const char *) = get_handler_for_opening(ext_list, info->name);
+
+            if (open_file == NULL) {
+                continue;
+            }
+            open_file(info->name);
         } else if (ch == COPY || ch == CUT) {
             struct file_info *info;
             vector_get(vec, cursor_pos, (void **) &info);
@@ -110,6 +124,7 @@ int main() {
 
     tcsetattr(STDIN_FILENO, TCSANOW, &old_attr);
     vector_free(vec);
+    vector_free(ext_list);
 
     return 0;
 }
