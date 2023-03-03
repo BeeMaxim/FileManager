@@ -31,6 +31,9 @@ int main() {
     char clip_board_path[256];
     char clip_board_name[256];
 
+    clip_board_path[0] = '\0';
+    clip_board_name[0] = '\0';
+
     file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
 
     struct termios old_attr, new_attr;
@@ -97,7 +100,7 @@ int main() {
                 cut_file = 1;
             }
         } else if (ch == PASTE) {
-            if (exist(vec, clip_board_name)) {
+            if (strcmp(clip_board_path, "") == 0 || exist(vec, clip_board_name)) {
                 continue;
             }
             copy_file(clip_board_path, clip_board_name);
@@ -105,6 +108,8 @@ int main() {
                 unlink(clip_board_path);
             }
             file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
+            clip_board_path[0] = '\0';
+            clip_board_name[0] = '\0';
             cut_file = 0;
         } else if (ch == HIDE) {
             hidden_files ^= 1;
