@@ -11,7 +11,7 @@ void handlers_init(struct vector *ext_list) {
 
     while ((ent = readdir(directory))) {
         char buf[512];
-        snprintf(buf, sizeof(buf), "../%s", ent->d_name);
+        snprintf(buf, sizeof(buf), "../extensions/%s", ent->d_name);
         void *handle = dlopen(buf, RTLD_LAZY);
         if (handle == NULL) {
             continue;
