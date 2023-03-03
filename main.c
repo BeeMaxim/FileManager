@@ -104,10 +104,12 @@ int main() {
                 continue;
             }
             copy_file(clip_board_path, clip_board_name);
-            if (cut_file) {
+
+            int old = file_count;
+            file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
+            if (old + 1 == file_count && cut_file) {
                 unlink(clip_board_path);
             }
-            file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
             clip_board_path[0] = '\0';
             clip_board_name[0] = '\0';
             cut_file = 0;
