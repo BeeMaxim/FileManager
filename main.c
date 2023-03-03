@@ -24,13 +24,14 @@ int main() {
     handlers_init(ext_list);
 
     int cursor_pos = 0;
+    int display_start = 0;
     int hidden_files = 0;
     int file_count = 0;
     int cut_file = 0;
     char clip_board_path[256];
     char clip_board_name[256];
 
-    file_count = update_screen(vec, cursor_pos, hidden_files);
+    file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
 
     struct termios old_attr, new_attr;
     tcgetattr(STDIN_FILENO, &old_attr);
@@ -51,13 +52,13 @@ int main() {
                         --cursor_pos;
                     }
                     clear_screen();
-                    file_count = display_file_system(vec, cursor_pos);
+                    file_count = display_file_system(vec, cursor_pos, &display_start);
                 } else if (ch == 66) {
                     if (cursor_pos < file_count - 1) {
                         ++cursor_pos;
                     }
                     clear_screen();
-                    file_count = display_file_system(vec, cursor_pos);
+                    file_count = display_file_system(vec, cursor_pos, &display_start);
                 }
             }
         } else if (ch == ENTER) {
@@ -67,7 +68,7 @@ int main() {
             if (S_ISDIR(info->fstat.st_mode)) {
                 chdir(info->name);
                 cursor_pos = 0;
-                file_count = update_screen(vec, cursor_pos, hidden_files);
+                file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
                 continue;
             }
 
@@ -93,14 +94,19 @@ int main() {
                 continue;
             }
             copy_file(clip_board_path, clip_board_name);
-            file_count = update_screen(vec, cursor_pos, hidden_files);
             if (cut_file) {
                 unlink(clip_board_path);
             }
+            file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
             cut_file = 0;
         } else if (ch == HIDE) {
             hidden_files ^= 1;
-            file_count = update_screen(vec, cursor_pos, hidden_files);
+            vector_clear(vec);
+            get_files_from_directory(vec, ".", hidden_files);
+            if (cursor_pos + 1 >= vec->size) {
+                cursor_pos = vec->size - 1;
+            }
+            file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
         } else if (ch == DELETE) {
             struct file_info *info;
             vector_get(vec, cursor_pos, (void **) &info);
@@ -112,11 +118,11 @@ int main() {
 
             vector_clear(vec);
             get_files_from_directory(vec, ".", hidden_files);
-            if (cursor_pos + 1 == file_count) {
-                --cursor_pos;
+            if (cursor_pos + 1 >= file_count) {
+                cursor_pos = file_count - 1;
             }
             clear_screen();
-            file_count = display_file_system(vec, cursor_pos);
+            file_count = display_file_system(vec, cursor_pos, &display_start);
         } else if (ch == QUIT) {
             break;
         }

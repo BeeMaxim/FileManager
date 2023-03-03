@@ -26,6 +26,6 @@ int exist(struct vector *vec, const char *name);
 
 void clear_screen();
 
-int display_file_system(struct vector *vec, int cursor_pos);
+int display_file_system(struct vector *vec, int cursor_pos, int *display_start);
 
-int update_screen(struct vector *vec, int cursor_pos, int hidden_files);
+int update_screen(struct vector *vec, int cursor_pos, int *display_start, int hidden_files);

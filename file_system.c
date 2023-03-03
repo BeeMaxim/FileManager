@@ -51,10 +51,19 @@ void clear_screen() {
     system("clear");
 }
 
-int display_file_system(struct vector *vec, int cursor_pos) {
+int display_file_system(struct vector *vec, int cursor_pos, int *display_start) {
     struct winsize window;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
     int window_width = window.ws_col;
+    int window_height = window.ws_row;
+
+    if (cursor_pos >= *display_start + window_height - 2) {
+        *display_start = cursor_pos - window_height + 3;
+    }
+
+    if (cursor_pos < *display_start) {
+        *display_start = cursor_pos;
+    }
 
     printf("\033[30m\033[107m%*s%*s\033[0m\n", -(window_width - 20), "   Name", 20, "Modified ");
     printf("\033[97m\033[40m");
@@ -63,9 +72,12 @@ int display_file_system(struct vector *vec, int cursor_pos) {
     time_t current_time = time(NULL);
     localtime_r(&current_time, &current_time_buf);
 
-    int file_count = 0;
+    int stop = *display_start + window_height - 2;
+    if (vec->size < stop) {
+        stop = vec->size;
+    }
 
-    for (int i = 0; i < vec->size; ++i) {
+    for (int i = *display_start; i < stop; ++i) {
         struct file_info *info;
         vector_get(vec, i, (void **) &info);
 
@@ -80,7 +92,7 @@ int display_file_system(struct vector *vec, int cursor_pos) {
 
         char *pref = "   ";
 
-        if (file_count == cursor_pos) {
+        if (i == cursor_pos) {
             pref = "-> ";
         }
         printf("%s", pref);
@@ -94,17 +106,15 @@ int display_file_system(struct vector *vec, int cursor_pos) {
         printf("%s", info->name);
         printf("\033[97m");
         printf("%*s\n", (int) (window_width - strlen(info->name) - 3), formatted_time_buf);
-
-        ++file_count;
     }
     printf("\033[0m");
 
-    return file_count;
+    return vec->size;
 }
 
-int update_screen(struct vector *vec, int cursor_pos, int hidden_files) {
+int update_screen(struct vector *vec, int cursor_pos, int *display_start, int hidden_files) {
     vector_clear(vec);
     get_files_from_directory(vec, ".", hidden_files);
     clear_screen();
-    return display_file_system(vec, cursor_pos);
+    return display_file_system(vec, cursor_pos, display_start);
 }
