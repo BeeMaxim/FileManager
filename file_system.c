@@ -58,6 +58,16 @@ void clear_screen() {
     system("clear");
 }
 
+static size_t strlen_utf8(const char *str) {
+    size_t count = 0;
+    for (size_t i = 0; i < strlen(str); ++i) {
+        if (((unsigned int)(unsigned char)str[i] >> 6) != 2) {
+            ++count;
+        }
+    }
+    return count;
+}
+
 int display_file_system(struct vector *vec, int cursor_pos, int *display_start) {
     struct winsize window;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
@@ -112,7 +122,7 @@ int display_file_system(struct vector *vec, int cursor_pos, int *display_start) 
         }
         printf("%s", info->name);
         printf("\033[97m");
-        printf("%*s\n", (int) (window_width - strlen(info->name) - 3), formatted_time_buf);
+        printf("%*s\n", (int) (window_width - strlen_utf8(info->name) - 3), formatted_time_buf);
     }
     printf("\033[0m");
 
