@@ -6,6 +6,9 @@ const char *get_extension() {
 }
 
 int open_file(const char *name) {
+    if (access(name, R_OK)) {
+        return -1;
+    }
     pid_t pid = fork();
 
     if (pid == 0) {

@@ -3,8 +3,6 @@ project(FileManager C)
 
 set(CMAKE_C_STANDARD 11)
 
-#set(CMAKE_SHARED_LINKER_FLAGS -ldl)
-
 add_executable(main main.c vector.c file_system.c open_txt.c file_open.c)
 
 target_link_libraries(main PUBLIC dl)

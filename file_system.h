@@ -12,7 +12,7 @@
 #include "vector.h"
 
 struct file_info {
-    char name[256];
+    char name[30];
     struct stat fstat;
 };
 

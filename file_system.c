@@ -14,6 +14,10 @@ int copy_file(char *clip_board_path, char *clip_board_name) {
 
 int get_files_from_directory(struct vector *vec, const char *dir_name, int hidden_files) {
     DIR *directory = opendir(dir_name);
+    if (directory == NULL) {
+        return 1;
+    }
+
     struct dirent *ent;
 
     while ((ent = readdir(directory))) {
@@ -22,10 +26,13 @@ int get_files_from_directory(struct vector *vec, const char *dir_name, int hidde
             continue;
         }
         struct stat dir_info;
-        lstat(ent->d_name, &dir_info);
+        int ret = lstat(ent->d_name, &dir_info);
+        if (ret < 0) {
+            continue;
+        }
         struct file_info info;
 
-        strcpy(info.name, ent->d_name);
+        ret = snprintf(info.name, sizeof(info.name), "%s", ent->d_name);
         info.fstat = dir_info;
         vector_push_back(vec, &info);
     }
@@ -114,7 +121,9 @@ int display_file_system(struct vector *vec, int cursor_pos, int *display_start) 
 
 int update_screen(struct vector *vec, int cursor_pos, int *display_start, int hidden_files) {
     vector_clear(vec);
-    get_files_from_directory(vec, ".", hidden_files);
+    if (get_files_from_directory(vec, ".", hidden_files)) {
+        return -1;
+    }
     clear_screen();
     return display_file_system(vec, cursor_pos, display_start);
 }

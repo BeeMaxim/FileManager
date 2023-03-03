@@ -66,9 +66,16 @@ int main() {
             vector_get(vec, cursor_pos, (void **) &info);
 
             if (S_ISDIR(info->fstat.st_mode)) {
-                chdir(info->name);
+                int ret = chdir(info->name);
+                if (ret != 0) {
+                    continue;
+                }
                 cursor_pos = 0;
                 file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
+                if (file_count == -1) {
+                    chdir("..");
+                    file_count = update_screen(vec, cursor_pos, &display_start, hidden_files);
+                }
                 continue;
             }
 
